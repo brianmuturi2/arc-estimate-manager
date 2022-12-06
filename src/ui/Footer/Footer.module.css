@@ -1,0 +1,23 @@
+.footer {
+    background-color: #0B72B9;
+    width: 100%;
+    z-index: 1302;
+    position: relative;
+}
+
+.adornment {
+    width: 25em;
+    vertical-align: bottom;
+}
+
+@media only screen and (max-width: 900px) {
+    .adornment {
+        width: 21em;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .adornment {
+        width: 15em;
+    }
+}

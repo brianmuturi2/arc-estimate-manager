@@ -1,0 +1,31 @@
+.toolbarMargin {
+    margin-bottom: 10em;
+}
+
+.logo {
+    height: 8em;
+}
+
+.appBar {
+    z-index: 10001;
+}
+
+@media only screen and (max-width: 900px) {
+    .toolbarMargin {
+        margin-bottom: 9em;
+    }
+
+    .logo {
+        height: 7em;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .toolbarMargin {
+        margin-bottom: 7.5em;
+    }
+
+    .logo {
+        height: 5.5em;
+    }
+}
