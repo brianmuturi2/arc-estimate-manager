@@ -1,0 +1,12 @@
+.mainContainer {
+    margin: 2em 5em;
+}
+
+.label {
+    color: #0B72B9;
+    font-weight: 700;
+}
+
+.label:first-child {
+    margin-left: 0;
+}
