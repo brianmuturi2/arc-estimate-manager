@@ -27,6 +27,10 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -37,6 +41,20 @@ import styles from './index.module.css';
 function createData(name, date, service, features, complexity, platforms, users, total) {
     return {name, date, service, features, complexity, platforms, users, total}
 }
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
+
+const platformOptions = ['Web', 'iOS', 'Android'];
+const featureOptions = ['Photo/Video', 'GPS', 'File Transfer', 'Users/Authentication', 'Biometrics', 'Push Notification'];
 
 export default function Index() {
 
@@ -59,6 +77,9 @@ export default function Index() {
     const [selectedComplexity, setSelectedComplexity] = useState();
 
     const [usersGroup, setUsersGroup] = useState();
+
+    const [platforms, setPlatforms] = useState([]);
+    const [features, setFeatures] = useState([]);
 
     useEffect(() => {
         const data = [
@@ -118,6 +139,24 @@ export default function Index() {
     function handleUsers(event) {
         setUsersGroup(event.target.value)
     }
+
+    const handlePlatformsChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setPlatforms(
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+
+    const handleFeaturesChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setFeatures(
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
 
     return (
         <>
@@ -238,7 +277,7 @@ export default function Index() {
                                         onChange={handleFormChange.bind(this, 'name')}
                                     />
                                 </Grid>
-                                <Grid item>
+                                <Grid item style={{marginBottom: '2em'}}>
                                     <FormControl>
                                         <FormLabel id="service">Service</FormLabel>
                                         <RadioGroup
@@ -250,6 +289,29 @@ export default function Index() {
                                             <FormControlLabel value="mobile app" control={<Radio />} label="Mobile App" />
                                             <FormControlLabel value="website" control={<Radio />} label="Website" />
                                         </RadioGroup>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="platform">Platform</InputLabel>
+                                        <Select
+                                            labelId="platform"
+                                            id="demo-multiple-name"
+                                            multiple
+                                            value={platforms}
+                                            onChange={handlePlatformsChange}
+                                            input={<OutlinedInput label="Platform"/>}
+                                            MenuProps={MenuProps}
+                                        >
+                                            {platformOptions.map((platform) => (
+                                                <MenuItem
+                                                    key={platform}
+                                                    value={platform}
+                                                >
+                                                    {platform}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
                                     </FormControl>
                                 </Grid>
                             </Grid>
@@ -291,7 +353,7 @@ export default function Index() {
                                         InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
                                     />
                                 </Grid>
-                                <Grid item>
+                                <Grid item style={{marginBottom: '2em'}}>
                                     <FormControl>
                                         <FormLabel id="users">Users</FormLabel>
                                         <RadioGroup
@@ -303,6 +365,29 @@ export default function Index() {
                                             <FormControlLabel value="10-100" control={<Radio />} label="10-100" />
                                             <FormControlLabel value="100+" control={<Radio />} label="100+" />
                                         </RadioGroup>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item>
+                                    <FormControl sx={{width: 250}}>
+                                        <InputLabel id="platform">Features</InputLabel>
+                                        <Select
+                                            labelId="features"
+                                            id="demo-multiple-name"
+                                            multiple
+                                            value={features}
+                                            onChange={handleFeaturesChange}
+                                            input={<OutlinedInput label="Features"/>}
+                                            MenuProps={MenuProps}
+                                        >
+                                            {featureOptions.map((feature) => (
+                                                <MenuItem
+                                                    key={feature}
+                                                    value={feature}
+                                                >
+                                                    {feature}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
                                     </FormControl>
                                 </Grid>
                             </Grid>
