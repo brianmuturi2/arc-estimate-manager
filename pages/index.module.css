@@ -1,5 +1,5 @@
 .mainContainer {
-    margin: 2em 5em;
+    padding: 2em 5em;
 }
 
 .label {
@@ -9,4 +9,8 @@
 
 .label:first-child {
     margin-left: 0;
+}
+
+.rowContainer {
+    margin-top: 2em;
 }
