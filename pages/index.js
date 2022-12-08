@@ -23,6 +23,10 @@ import Paper from '@mui/material/Paper';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -49,6 +53,12 @@ export default function Index() {
     const [dialogOpen, setDialogOpen] = useState(false);
 
     const [dateValue, setDateValue] = useState();
+
+    const [selectedService, setSelectedService] = useState();
+
+    const [selectedComplexity, setSelectedComplexity] = useState();
+
+    const [usersGroup, setUsersGroup] = useState();
 
     useEffect(() => {
         const data = [
@@ -95,6 +105,18 @@ export default function Index() {
             case 'total':
                 break;
         }
+    }
+
+    function handleService(event) {
+        setSelectedService(event.target.value);
+    }
+
+    function handleComplexity(event) {
+        setSelectedComplexity(event.target.value);
+    }
+
+    function handleUsers(event) {
+        setUsersGroup(event.target.value)
     }
 
     return (
@@ -197,7 +219,7 @@ export default function Index() {
                     </Paper>
                 </Grid>
             </Grid>
-            <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth maxWidth={'md'}>
+            <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth maxWidth={'md'} scroll={'paper'}>
                 <DialogContent>
                     <Grid container justifyContent={'center'} direction={matchesMd ? 'column' : 'row'}>
                         <Grid item>
@@ -205,18 +227,35 @@ export default function Index() {
                                 Add a new project
                             </Typography>
                         </Grid>
-                        <Grid item container justifyContent={'space-between'} direction={matchesMd ? 'column' : 'row'}>
-                            <Grid item style={{marginBottom: matchesMd ? '2em' : ''}}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="outlined-required"
-                                    label="Name"
-                                    onChange={handleFormChange.bind(this, 'name')}
-                                />
+                        <Grid item container>
+                            <Grid item container direction={'column'} sm style={{padding: '1em'}}>
+                                <Grid item style={{marginBottom: '2em'}}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="outlined-required"
+                                        label="Name"
+                                        onChange={handleFormChange.bind(this, 'name')}
+                                    />
+                                </Grid>
+                                <Grid item>
+                                    <FormControl>
+                                        <FormLabel id="service">Service</FormLabel>
+                                        <RadioGroup
+                                            onChange={handleService}
+                                            aria-labelledby="service"
+                                            name="service"
+                                        >
+                                            <FormControlLabel value="custom software" control={<Radio />} label="Custom Software" />
+                                            <FormControlLabel value="mobile app" control={<Radio />} label="Mobile App" />
+                                            <FormControlLabel value="website" control={<Radio />} label="Website" />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </Grid>
                             </Grid>
-                            <Grid item style={{marginBottom: matchesMd ? '2em' : ''}}>
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <Grid item container direction={'column'} style={{marginBottom: '2em', padding: '1em'}} sm >
+                                <Grid item style={{marginBottom: '2em'}}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
                                         <DesktopDatePicker
                                             label="Date"
                                             inputFormat="dd/MM/yyyy"
@@ -224,17 +263,48 @@ export default function Index() {
                                             onChange={handleDateChange}
                                             renderInput={(params) => <TextField {...params} fullWidth />}
                                         />
-                                </LocalizationProvider>
+                                    </LocalizationProvider>
+                                </Grid>
+                                <Grid item>
+                                    <FormControl>
+                                        <FormLabel id="complexity">Complexity</FormLabel>
+                                        <RadioGroup
+                                            onChange={handleComplexity}
+                                            aria-labelledby="complexity"
+                                            name="complexity"
+                                        >
+                                            <FormControlLabel value="low" control={<Radio />} label="Low" />
+                                            <FormControlLabel value="medium" control={<Radio />} label="Medium" />
+                                            <FormControlLabel value="high" control={<Radio />} label="High" />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </Grid>
                             </Grid>
-                            <Grid item style={{marginBottom: matchesMd ? '2em' : ''}}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="outlined-required"
-                                    label="Total"
-                                    onChange={handleFormChange.bind(this, 'total')}
-                                    InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
-                                />
+                            <Grid item container direction={'column'} style={{marginBottom: '2em', padding: '1em'}} sm>
+                                <Grid item style={{marginBottom: '2em'}}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="outlined-required"
+                                        label="Total"
+                                        onChange={handleFormChange.bind(this, 'total')}
+                                        InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                                    />
+                                </Grid>
+                                <Grid item>
+                                    <FormControl>
+                                        <FormLabel id="users">Users</FormLabel>
+                                        <RadioGroup
+                                            onChange={handleUsers}
+                                            aria-labelledby="users"
+                                            name="users"
+                                        >
+                                            <FormControlLabel value="0-10" control={<Radio />} label="0-10" />
+                                            <FormControlLabel value="10-100" control={<Radio />} label="10-100" />
+                                            <FormControlLabel value="100+" control={<Radio />} label="100+" />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
