@@ -31,15 +31,17 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 import styles from './index.module.css';
+import {format} from 'date-fns';
 
-function createData(name, date, service, features, complexity, platforms, users, total) {
-    return {name, date, service, features, complexity, platforms, users, total}
+function createData(name, date, service, features, complexity, platform, users, total) {
+    return {name, date, service, features, complexity, platform, users, total}
 }
 
 const ITEM_HEIGHT = 48;
@@ -70,7 +72,11 @@ export default function Index() {
 
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    const [dateValue, setDateValue] = useState();
+    const [name, setName] = useState();
+
+    const [total, setTotal] = useState();
+
+    const [dateValue, setDateValue] = useState(new Date());
 
     const [selectedService, setSelectedService] = useState();
 
@@ -115,17 +121,12 @@ export default function Index() {
         setDialogOpen(!dialogOpen);
     }
 
-    function handleDateChange(newValue){
-        setDateValue(newValue);
+    function handleNameChange(event) {
+        setName(event.target.value);
     }
 
-    function handleFormChange(type){
-        switch (type) {
-            case 'name':
-                break;
-            case 'total':
-                break;
-        }
+    function handleTotalChange(event) {
+        setTotal(event.target.value)
     }
 
     function handleService(event) {
@@ -157,6 +158,50 @@ export default function Index() {
             typeof value === 'string' ? value.split(',') : value,
         );
     };
+
+    const addProject = () => {
+        const newRow = createData(
+            name,
+            format(dateValue, 'dd/MM/yy'),
+            selectedService,
+            features.join(','),
+            selectedComplexity,
+            platforms.join(','),
+            usersGroup,
+            total
+        );
+
+        setRows([
+            ...rows,
+            newRow
+        ])
+        handleDialogClose();
+        resetFormsState()
+    }
+
+    function resetFormsState() {
+        setName('');
+        setDateValue(new Date());
+        setSelectedService('');
+        setFeatures([]);
+        setSelectedComplexity('');
+        setPlatforms([]);
+        setUsersGroup('');
+        setTotal('');
+    }
+
+    function disableAdd() {
+        return (
+            !name
+            || !dateValue
+            || !selectedService
+            || !features.length
+            || !selectedComplexity
+            || !platforms.length
+            || !usersGroup
+            || !total
+        )
+    }
 
     return (
         <>
@@ -274,7 +319,7 @@ export default function Index() {
                                         fullWidth
                                         id="outlined-required"
                                         label="Name"
-                                        onChange={handleFormChange.bind(this, 'name')}
+                                        onChange={handleNameChange}
                                     />
                                 </Grid>
                                 <Grid item style={{marginBottom: '2em'}}>
@@ -322,12 +367,12 @@ export default function Index() {
                                             label="Date"
                                             inputFormat="dd/MM/yyyy"
                                             value={dateValue}
-                                            onChange={handleDateChange}
+                                            onChange={(newValue) => setDateValue(newValue)}
                                             renderInput={(params) => <TextField {...params} fullWidth />}
                                         />
                                     </LocalizationProvider>
                                 </Grid>
-                                <Grid item>
+                                <Grid item style={{marginBottom: '2em'}}>
                                     <FormControl>
                                         <FormLabel id="complexity">Complexity</FormLabel>
                                         <RadioGroup
@@ -338,32 +383,6 @@ export default function Index() {
                                             <FormControlLabel value="low" control={<Radio />} label="Low" />
                                             <FormControlLabel value="medium" control={<Radio />} label="Medium" />
                                             <FormControlLabel value="high" control={<Radio />} label="High" />
-                                        </RadioGroup>
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-                            <Grid item container direction={'column'} style={{marginBottom: '2em', padding: '1em'}} sm>
-                                <Grid item style={{marginBottom: '2em'}}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="outlined-required"
-                                        label="Total"
-                                        onChange={handleFormChange.bind(this, 'total')}
-                                        InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
-                                    />
-                                </Grid>
-                                <Grid item style={{marginBottom: '2em'}}>
-                                    <FormControl>
-                                        <FormLabel id="users">Users</FormLabel>
-                                        <RadioGroup
-                                            onChange={handleUsers}
-                                            aria-labelledby="users"
-                                            name="users"
-                                        >
-                                            <FormControlLabel value="0-10" control={<Radio />} label="0-10" />
-                                            <FormControlLabel value="10-100" control={<Radio />} label="10-100" />
-                                            <FormControlLabel value="100+" control={<Radio />} label="100+" />
                                         </RadioGroup>
                                     </FormControl>
                                 </Grid>
@@ -390,6 +409,40 @@ export default function Index() {
                                         </Select>
                                     </FormControl>
                                 </Grid>
+                            </Grid>
+                            <Grid item container direction={'column'} style={{marginBottom: '2em', padding: '1em'}} sm>
+                                <Grid item style={{marginBottom: '2em'}}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="outlined-required"
+                                        label="Total"
+                                        onChange={handleTotalChange}
+                                        InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                                    />
+                                </Grid>
+                                <Grid item style={{marginBottom: '2em'}}>
+                                    <FormControl>
+                                        <FormLabel id="users">Users</FormLabel>
+                                        <RadioGroup
+                                            onChange={handleUsers}
+                                            aria-labelledby="users"
+                                            name="users"
+                                        >
+                                            <FormControlLabel value="0-10" control={<Radio />} label="0-10" />
+                                            <FormControlLabel value="10-100" control={<Radio />} label="10-100" />
+                                            <FormControlLabel value="100+" control={<Radio />} label="100+" />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid item container alignItems={'flex-end'} justifyContent={'flex-end'}>
+                            <Grid item>
+                                <Button color={'primary'} style={{fontWeight: 300}} onClick={handleDialogClose}>Cancel</Button>
+                            </Grid>
+                            <Grid item>
+                                <Button variant={'contained'} color={'secondary'} className={styles.addButton} onClick={addProject} disabled={disableAdd()}>Add Project</Button>
                             </Grid>
                         </Grid>
                     </Grid>
