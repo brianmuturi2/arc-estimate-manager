@@ -13,13 +13,6 @@ import {
     useTheme
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -39,9 +32,10 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 import styles from './index.module.css';
 import {format} from 'date-fns';
+import EnhancedTable from '../src/ui/EnhancedTable/EnhancedTable';
 
-function createData(name, date, service, features, complexity, platform, users, total) {
-    return {name, date, service, features, complexity, platform, users, total}
+function createData(name, date, service, features, complexity, platform, users, total, search) {
+    return {name, date, service, features, complexity, platform, users, total, search}
 }
 
 const ITEM_HEIGHT = 48;
@@ -88,18 +82,39 @@ export default function Index() {
     const [platforms, setPlatforms] = useState([]);
     const [features, setFeatures] = useState([]);
 
+    const [search, setSearch] = useState('');
+
     useEffect(() => {
         const data = [
-            createData('Brian Muturi', '11/2/19', 'Website', 'E-Commerce', 'N/A', 'N/A', 'N/A', '51500'),
-            createData('Bill Gates', '10/17/19', 'Custom Software', 'GPS, Push Notification, Users/Authentication, File Transfer', 'Medium', 'Web Application', '0-10', '$1600'),
-            createData('Elon Musk', '2/13/19', 'Custom Software', 'Photos, Videos, Users/Authentication, File Transfer', 'Medium', 'Web Application', '0-10', '$1600'),
+            createData('Brian Muturi', '11/2/19', 'Website', 'E-Commerce', 'N/A', 'N/A', 'N/A', '51500', true),
+            createData('Bill Gates', '10/17/19', 'Custom Software', 'GPS, Push Notification, Users/Authentication, File Transfer', 'Medium', 'Web Application', '0-10', '$1600', true),
+            createData('Elon Musk', '2/13/19', 'Custom Software', 'Photos, Videos, Users/Authentication, File Transfer', 'Medium', 'Web Application', '0-10', '$1600', true),
         ];
         setRows(data);
     }, [])
 
-    function search(){
+    const handleSearch = event => {
+        setSearch(event.target.value);
 
-    }
+        const rowData = rows.map(row =>
+            Object.values(row).filter(option => option !== true && option !== false)
+        );
+
+        const matches = rowData.map(row =>
+            row.map(option =>
+                option.toLowerCase().includes(event.target.value.toLowerCase())
+            )
+        );
+
+        const newRows = [...rows];
+        matches.map((row, index) =>
+            row.includes(true)
+                ? (newRows[index].search = true)
+                : (newRows[index].search = false)
+        );
+
+        setRows(newRows);
+    };
 
     function handleSwitchChange(type){
         switch (type) {
@@ -180,7 +195,8 @@ export default function Index() {
             complexity,
             platform,
             users,
-            `$${total}`
+            `$${total}`,
+            true
         );
 
         setRows([
@@ -226,12 +242,12 @@ export default function Index() {
                     <TextField
                         id="input-with-icon-textfield"
                         label="Search"
+                        value={search}
+                        onChange={handleSearch}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end" onClick={handleDialogClose}>
-                                    <IconButton onClick={search}>
-                                        <AddCircleIcon/>
-                                    </IconButton>
+                                    <AddCircleIcon/>
                                 </InputAdornment>
                             ),
                         }}
@@ -277,43 +293,7 @@ export default function Index() {
                     </Grid>
                 </Grid>
                 <Grid item>
-                    <Paper sx={{ width: '100%' }}>
-                        <TableContainer>
-                            <Table sx={{ minWidth: 500 }} stickyHeader aria-label="sticky table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Date</TableCell>
-                                        <TableCell>Service</TableCell>
-                                        <TableCell>Features</TableCell>
-                                        <TableCell>Complexity</TableCell>
-                                        <TableCell>Platforms</TableCell>
-                                        <TableCell>Users</TableCell>
-                                        <TableCell>Total</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {rows.map((row) => (
-                                        <TableRow
-                                            key={row.name}
-                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                        >
-                                            <TableCell component="th" scope="row">
-                                                {row.name}
-                                            </TableCell>
-                                            <TableCell>{row.date}</TableCell>
-                                            <TableCell>{row.service}</TableCell>
-                                            <TableCell style={{maxWidth: '5em'}}>{row.features}</TableCell>
-                                            <TableCell>{row.complexity}</TableCell>
-                                            <TableCell>{row.platform}</TableCell>
-                                            <TableCell>{row.users}</TableCell>
-                                            <TableCell>{row.total}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Paper>
+                    <EnhancedTable rows={rows}/>
                 </Grid>
             </Grid>
             <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth maxWidth={'md'} scroll={'paper'}>
