@@ -56,7 +56,8 @@ const MenuProps = {
 };
 
 const platformOptions = ['Web', 'iOS', 'Android'];
-const featureOptions = ['Photo/Video', 'GPS', 'File Transfer', 'Users/Authentication', 'Biometrics', 'Push Notification'];
+let featureOptions = ['Photo/Video', 'GPS', 'File Transfer', 'Users/Authentication', 'Biometrics', 'Push Notification'];
+let websiteOptions = ['Basic', 'Interactive', 'E-Commerce'];
 
 export default function Index() {
 
@@ -131,6 +132,12 @@ export default function Index() {
 
     function handleService(event) {
         setSelectedService(event.target.value);
+
+        if (event.target.value === 'website') {
+            setUsersGroup('');
+            setSelectedComplexity('');
+            featureOptions = websiteOptions
+        }
     }
 
     function handleComplexity(event) {
@@ -160,15 +167,20 @@ export default function Index() {
     };
 
     const addProject = () => {
+
+        const platform = selectedService !== 'website' ? platforms.join(',') : 'N/A';
+        const complexity = selectedService !== 'website' ? selectedComplexity : 'N/A';
+        const users = selectedService !== 'website' ? usersGroup : 'N/A';
+
         const newRow = createData(
             name,
             format(dateValue, 'dd/MM/yy'),
             selectedService,
             features.join(','),
-            selectedComplexity,
-            platforms.join(','),
-            usersGroup,
-            total
+            complexity,
+            platform,
+            users,
+            `$${total}`
         );
 
         setRows([
@@ -196,9 +208,10 @@ export default function Index() {
             || !dateValue
             || !selectedService
             || !features.length
-            || !selectedComplexity
-            || !platforms.length
-            || !usersGroup
+            || features.length > 1 && selectedService === 'website'
+            || (!selectedComplexity && selectedService !== 'website')
+            || (!platforms.length && selectedService !== 'website')
+            || (!usersGroup && selectedService !== 'website')
             || !total
         )
     }
@@ -337,7 +350,7 @@ export default function Index() {
                                     </FormControl>
                                 </Grid>
                                 <Grid item>
-                                    <FormControl fullWidth>
+                                    <FormControl fullWidth disabled={selectedService === 'website'}>
                                         <InputLabel id="platform">Platform</InputLabel>
                                         <Select
                                             labelId="platform"
@@ -380,9 +393,9 @@ export default function Index() {
                                             aria-labelledby="complexity"
                                             name="complexity"
                                         >
-                                            <FormControlLabel value="low" control={<Radio />} label="Low" />
-                                            <FormControlLabel value="medium" control={<Radio />} label="Medium" />
-                                            <FormControlLabel value="high" control={<Radio />} label="High" />
+                                            <FormControlLabel disabled={selectedService === 'website'} value="low" control={<Radio />} label="Low" />
+                                            <FormControlLabel disabled={selectedService === 'website'} value="medium" control={<Radio />} label="Medium" />
+                                            <FormControlLabel disabled={selectedService === 'website'} value="high" control={<Radio />} label="High" />
                                         </RadioGroup>
                                     </FormControl>
                                 </Grid>
@@ -429,9 +442,9 @@ export default function Index() {
                                             aria-labelledby="users"
                                             name="users"
                                         >
-                                            <FormControlLabel value="0-10" control={<Radio />} label="0-10" />
-                                            <FormControlLabel value="10-100" control={<Radio />} label="10-100" />
-                                            <FormControlLabel value="100+" control={<Radio />} label="100+" />
+                                            <FormControlLabel disabled={selectedService === 'website'} value="0-10" control={<Radio />} label="0-10" />
+                                            <FormControlLabel disabled={selectedService === 'website'} value="10-100" control={<Radio />} label="10-100" />
+                                            <FormControlLabel disabled={selectedService === 'website'} value="100+" control={<Radio />} label="100+" />
                                         </RadioGroup>
                                     </FormControl>
                                 </Grid>
