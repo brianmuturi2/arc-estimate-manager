@@ -175,7 +175,7 @@ function EnhancedTableToolbar(props) {
                 >
                     {numSelected} selected
                 </Typography>
-            ) : null}
+            ) : <Typography>{null}</Typography>}
 
             {numSelected > 0 ? (
                 <Tooltip title="Delete">
@@ -198,11 +198,10 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({rows}) {
+export default function EnhancedTable({rows, page, setPage}) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('name ');
     const [selected, setSelected] = React.useState([]);
-    const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
     const handleRequestSort = (event, property) => {
@@ -250,10 +249,6 @@ export default function EnhancedTable({rows}) {
     };
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
-
-    // Avoid a layout jump when reaching the last page with empty rows.
-    const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -319,22 +314,13 @@ export default function EnhancedTable({rows}) {
                                         </TableRow>
                                     );
                                 })}
-                            {emptyRows > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: (53) * emptyRows,
-                                    }}
-                                >
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={rows.length}
+                    count={rows.filter(row => row.search).length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

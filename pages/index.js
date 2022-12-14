@@ -50,6 +50,7 @@ const MenuProps = {
 };
 
 const platformOptions = ['Web', 'iOS', 'Android'];
+let defaultFeatureOptions = ['Photo/Video', 'GPS', 'File Transfer', 'Users/Authentication', 'Biometrics', 'Push Notification'];
 let featureOptions = ['Photo/Video', 'GPS', 'File Transfer', 'Users/Authentication', 'Biometrics', 'Push Notification'];
 let websiteOptions = ['Basic', 'Interactive', 'E-Commerce'];
 
@@ -83,6 +84,7 @@ export default function Index() {
     const [features, setFeatures] = useState([]);
 
     const [search, setSearch] = useState('');
+    const [page, setPage] = React.useState(0);
 
     useEffect(() => {
         const data = [
@@ -114,6 +116,7 @@ export default function Index() {
         );
 
         setRows(newRows);
+        setPage(0)
     };
 
     function handleSwitchChange(type){
@@ -152,6 +155,8 @@ export default function Index() {
             setUsersGroup('');
             setSelectedComplexity('');
             featureOptions = websiteOptions
+        } else {
+            featureOptions = defaultFeatureOptions;
         }
     }
 
@@ -247,7 +252,9 @@ export default function Index() {
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end" onClick={handleDialogClose}>
-                                    <AddCircleIcon/>
+                                    <IconButton>
+                                        <AddCircleIcon/>
+                                    </IconButton>
                                 </InputAdornment>
                             ),
                         }}
@@ -286,14 +293,8 @@ export default function Index() {
                                           labelPlacement="start"/>
                     </FormGroup>
                 </Grid>
-                <Grid item container justifyContent={'flex-end'} className={styles.rowContainer}>
-                    <Grid item>
-                        <FilterListIcon
-                            color={'secondary'} style={{fontSize: 50, marginRight: 50}}/>
-                    </Grid>
-                </Grid>
-                <Grid item>
-                    <EnhancedTable rows={rows}/>
+                <Grid item className={styles.rowContainer}>
+                    <EnhancedTable rows={rows} page={page} setPage={setPage}/>
                 </Grid>
             </Grid>
             <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth maxWidth={'md'} scroll={'paper'}>
