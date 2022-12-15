@@ -1,0 +1,13 @@
+.menu:hover {
+    background-color: #fff;
+}
+
+.menu.Mui-focusVisible {
+    background-color: #fff;
+}
+
+.totalFilter {
+    cursor: pointer;
+    font-size: 2rem;
+    color: #FFBA60;
+}

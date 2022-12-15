@@ -16,14 +16,13 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import {useState} from 'react';
-import {Snackbar} from '@mui/material';
+import {InputAdornment, Menu, MenuItem, Snackbar, TextField} from '@mui/material';
 import Button from '@mui/material/Button';
+import styles from './EnhancedTable.module.css';
 
 function createData(name, calories, fat, carbs, protein) {
     return {
@@ -160,10 +159,15 @@ function EnhancedTableToolbar(props) {
     const [alert, setAlert] = useState(
         {
             open: false,
-            backgroundColor: '#FF3232',
+            backgroundColor: '#ff3232',
             message: 'Row deleted!'
         });
     const [undo, setUndo] = useState([]);
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+    const [totalFilter, setTotalFilter] = useState('>');
+    const [filterPrice, setFilterPrice] = useState('');
+
+    const menuOpen = Boolean(menuAnchorEl);
 
     function handleDelete() {
         const newRows = [...props.rows];
@@ -196,6 +200,49 @@ function EnhancedTableToolbar(props) {
         }
     }
 
+    const handleMenuClick = (event) => {
+        setMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setMenuAnchorEl(null);
+    };
+
+    const handleMenuItemClick = (i) => {
+        setMenuAnchorEl(null);
+        handleMenuClose();
+    }
+
+    function handleSetFilter() {
+        if (totalFilter === '>') {
+            setTotalFilter('<');
+        } else if (totalFilter === '<') {
+            setTotalFilter('=');
+        } else {
+            setTotalFilter('>');
+        }
+        if (filterPrice) {
+            filterRows();
+        }
+    }
+
+    function handleTotalFilter(event){
+        setFilterPrice(event.target.value);
+
+        if (event.target.value !== '') {
+            filterRows()
+        }
+    }
+
+    function filterRows() {
+        const filter = totalFilter === '=' ? '===' : totalFilter;
+        console.log(filter)
+
+        const newRows = [...props.rows];
+        newRows.map(row => eval(`${event.target.value} ${filter} ${row.total.slice(1, row.total.length)}`) ? row.search = true : row.search = false);
+        props.setRows(newRows);
+    }
+
     return (
         <Toolbar
             sx={{
@@ -226,7 +273,7 @@ function EnhancedTableToolbar(props) {
                 </Tooltip>
             ) : (
                 <Tooltip title="Filter list">
-                    <IconButton>
+                    <IconButton onClick={handleMenuClick}>
                         <FilterListIcon />
                     </IconButton>
                 </Tooltip>
@@ -243,6 +290,32 @@ function EnhancedTableToolbar(props) {
                 message={alert.message}
                 action={<Button style={{color: '#fff'}} onClick={handleUndo}>UNDO</Button>}
             />
+            <Menu
+                id="services-menu"
+                anchorEl={menuAnchorEl}
+                open={menuOpen}
+                onClose={handleMenuClose}
+            >
+                <MenuItem classes={{root: styles.menu}}>
+                    <TextField
+                        value={filterPrice}
+                        onChange={handleTotalFilter}
+                        placeholder={'Enter a price to filter'}
+                        type={'number'}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position={'start'}>$</InputAdornment>
+                            ),
+                            endAdornment: (
+                                <InputAdornment
+                                    position={'end'}
+                                     onClick={handleSetFilter}>
+                                    <span className={styles.totalFilter}>{totalFilter}</span>
+                                </InputAdornment>
+                            )
+                        }}/>
+                </MenuItem>
+            </Menu>
         </Toolbar>
     );
 }
@@ -314,8 +387,7 @@ export default function EnhancedTable({rows, page, setPage, setRows, websiteChec
         } else {
             let newRows = websites.concat(iosApps.filter(item => websites.indexOf(item) < 0));
             let newRows2 = newRows.concat(androidApps.filter(item => newRows.indexOf(item) < 0));
-            let newRows3 = newRows2.concat(softwareApps.filter(item => newRows2.indexOf(item) < 0));
-            return newRows3;
+            return newRows2.concat(softwareApps.filter(item => newRows2.indexOf(item) < 0));
         }
     }
 

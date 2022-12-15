@@ -87,7 +87,7 @@ export default function Index() {
 
     useEffect(() => {
         const data = [
-            createData('Brian Muturi', '11/2/19', 'Website', 'E-Commerce', 'N/A', 'N/A', 'N/A', '51500', true),
+            createData('Brian Muturi', '11/2/19', 'Website', 'E-Commerce', 'N/A', 'N/A', 'N/A', '$51500', true),
             createData('Bill Gates', '10/17/19', 'Custom Software', 'GPS, Push Notification, Users/Authentication, File Transfer', 'Medium', 'Web Application', '0-10', '$1600', true),
             createData('Elon Musk', '2/13/19', 'Custom Software', 'Photos, Videos, Users/Authentication, File Transfer', 'Medium', 'Web Application', '0-10', '$1600', true),
         ];
