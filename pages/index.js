@@ -294,7 +294,7 @@ export default function Index() {
                     </FormGroup>
                 </Grid>
                 <Grid item className={styles.rowContainer}>
-                    <EnhancedTable rows={rows} page={page} setPage={setPage}/>
+                    <EnhancedTable rows={rows} page={page} setPage={setPage} setRows={setRows}/>
                 </Grid>
             </Grid>
             <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth maxWidth={'md'} scroll={'paper'}>

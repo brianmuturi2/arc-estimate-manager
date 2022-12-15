@@ -21,6 +21,9 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import {useState} from 'react';
+import {Snackbar} from '@mui/material';
+import Button from '@mui/material/Button';
 
 function createData(name, calories, fat, carbs, protein) {
     return {
@@ -154,6 +157,44 @@ EnhancedTableHead.propTypes = {
 
 function EnhancedTableToolbar(props) {
     const { numSelected } = props;
+    const [alert, setAlert] = useState(
+        {
+            open: false,
+            backgroundColor: '#FF3232',
+            message: 'Row deleted!'
+        });
+    const [undo, setUndo] = useState([]);
+
+    function handleDelete() {
+        const newRows = [...props.rows];
+        const selectedRows = newRows.filter(row => props.selected.includes(row.name));
+        selectedRows.map(row => row.search = false);
+        props.setRows(newRows);
+
+        setUndo(selectedRows);
+        props.setSelected([]);
+        setAlert(prevState => ({...prevState, open: true}))
+    }
+
+    function handleUndo() {
+        setAlert(prevState => ({...prevState, open: false}))
+
+        const newRows = [...props.rows];
+        const redo = [...undo];
+        redo.map(row => row.search = true);
+        Array.prototype.push.apply(newRows, ...redo);
+        props.setRows(newRows);
+    }
+
+    function handleCloseSnack(event, reason) {
+        console.log('event & reason', event, reason);
+        if (reason === 'clickaway') {
+            setAlert(prevState => ({...prevState, open: false}));
+            const newRows = [...props.rows];
+            const names = [...undo.map(row => row.name)];
+            props.setRows(newRows.filter(row => !names.includes(row.name)));
+        }
+    }
 
     return (
         <Toolbar
@@ -179,7 +220,7 @@ function EnhancedTableToolbar(props) {
 
             {numSelected > 0 ? (
                 <Tooltip title="Delete">
-                    <IconButton>
+                    <IconButton onClick={handleDelete}>
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>
@@ -190,6 +231,18 @@ function EnhancedTableToolbar(props) {
                     </IconButton>
                 </Tooltip>
             )}
+            <Snackbar
+                open={alert.open}
+                ContentProps={{
+                    style: {
+                        backgroundColor: alert.backgroundColor
+                    }
+                }}
+                anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+                onClose={handleCloseSnack}
+                message={alert.message}
+                action={<Button style={{color: '#fff'}} onClick={handleUndo}>UNDO</Button>}
+            />
         </Toolbar>
     );
 }
@@ -198,7 +251,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({rows, page, setPage}) {
+export default function EnhancedTable({rows, page, setPage, setRows}) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('name ');
     const [selected, setSelected] = React.useState([]);
@@ -253,7 +306,7 @@ export default function EnhancedTable({rows, page, setPage}) {
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
+                <EnhancedTableToolbar setRows={setRows} rows={rows} selected={selected} setSelected={setSelected} numSelected={selected.length} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
