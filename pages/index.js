@@ -13,7 +13,6 @@ import {
     useTheme
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import Radio from '@mui/material/Radio';
@@ -294,7 +293,15 @@ export default function Index() {
                     </FormGroup>
                 </Grid>
                 <Grid item className={styles.rowContainer}>
-                    <EnhancedTable rows={rows} page={page} setPage={setPage} setRows={setRows}/>
+                    <EnhancedTable
+                        rows={rows}
+                        page={page}
+                        setPage={setPage}
+                        setRows={setRows}
+                        websiteChecked={websiteChecked}
+                        androidChecked={androidChecked}
+                        iosChecked={iosChecked}
+                        softwareChecked={softwareChecked}/>
                 </Grid>
             </Grid>
             <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth maxWidth={'md'} scroll={'paper'}>

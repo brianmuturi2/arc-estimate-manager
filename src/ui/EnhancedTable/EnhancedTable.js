@@ -251,7 +251,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({rows, page, setPage, setRows}) {
+export default function EnhancedTable({rows, page, setPage, setRows, websiteChecked, androidChecked, iosChecked, softwareChecked}) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('name ');
     const [selected, setSelected] = React.useState([]);
@@ -303,83 +303,101 @@ export default function EnhancedTable({rows, page, setPage, setRows}) {
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
-    return (
-        <Box sx={{ width: '100%' }}>
-            <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar setRows={setRows} rows={rows} selected={selected} setSelected={setSelected} numSelected={selected.length} />
-                <TableContainer>
-                    <Table
-                        sx={{ minWidth: 750 }}
-                        aria-labelledby="tableTitle"
-                        size={'medium'}
-                    >
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
-                        />
-                        <TableBody>
-                            {/* if you don't need to support IE11, you can replace the `stableSort` call with:
-                 rows.sort(getComparator(order, orderBy)).slice() */}
-                            {stableSort(rows.filter(row => row.search), getComparator(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => {
-                                    const isItemSelected = isSelected(row.name);
-                                    const labelId = `enhanced-table-checkbox-${index}`;
+    function switchFilters() {
+        const websites = rows.filter(row => websiteChecked ? (row.service === 'Website' || row.service === 'website') : null);
+        const iosApps = rows.filter(row => iosChecked ? row.platform.includes('iOS') : null);
+        const androidApps = rows.filter(row => androidChecked ? row.platform.includes('Android') : null);
+        const softwareApps = rows.filter(row => softwareChecked ? (row.service === 'custom software' || row.service === 'Custom Software') : null);
 
-                                    return (
-                                        <TableRow
-                                            hover
-                                            onClick={(event) => handleClick(event, row.name)}
-                                            role="checkbox"
-                                            aria-checked={isItemSelected}
-                                            tabIndex={-1}
-                                            key={row.name}
-                                            selected={isItemSelected}
-                                        >
-                                            <TableCell>
-                                                <Checkbox
-                                                    color="primary"
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': labelId,
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell
-                                                component="th"
-                                                id={labelId}
-                                                scope="row"
-                                                align={'left'}
+        if (!websiteChecked && !iosChecked && !androidChecked && !softwareChecked) {
+            return rows;
+        } else {
+            let newRows = websites.concat(iosApps.filter(item => websites.indexOf(item) < 0));
+            let newRows2 = newRows.concat(androidApps.filter(item => newRows.indexOf(item) < 0));
+            let newRows3 = newRows2.concat(softwareApps.filter(item => newRows2.indexOf(item) < 0));
+            return newRows3;
+        }
+    }
+
+    return (
+        <>
+            <Box sx={{ width: '100%' }}>
+                <Paper sx={{ width: '100%', mb: 2 }}>
+                    <EnhancedTableToolbar setRows={setRows} rows={rows} selected={selected} setSelected={setSelected} numSelected={selected.length} />
+                    <TableContainer>
+                        <Table
+                            sx={{ minWidth: 750 }}
+                            aria-labelledby="tableTitle"
+                            size={'medium'}
+                        >
+                            <EnhancedTableHead
+                                numSelected={selected.length}
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={handleSelectAllClick}
+                                onRequestSort={handleRequestSort}
+                                rowCount={rows.length}
+                            />
+                            <TableBody>
+                                {/* if you don't need to support IE11, you can replace the `stableSort` call with:
+                 rows.sort(getComparator(order, orderBy)).slice() */}
+                                {stableSort(switchFilters().filter(row => row.search), getComparator(order, orderBy))
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .map((row, index) => {
+                                        const isItemSelected = isSelected(row.name);
+                                        const labelId = `enhanced-table-checkbox-${index}`;
+
+                                        return (
+                                            <TableRow
+                                                hover
+                                                onClick={(event) => handleClick(event, row.name)}
+                                                role="checkbox"
+                                                aria-checked={isItemSelected}
+                                                tabIndex={-1}
+                                                key={row.name}
+                                                selected={isItemSelected}
                                             >
-                                                {row.name}
-                                            </TableCell>
-                                            <TableCell align="left">{row.date}</TableCell>
-                                            <TableCell align="left">{row.service}</TableCell>
-                                            <TableCell align="left" style={{maxWidth: '5em'}}>{row.features}</TableCell>
-                                            <TableCell align="left">{row.complexity}</TableCell>
-                                            <TableCell align="left">{row.platform}</TableCell>
-                                            <TableCell align="left">{row.users}</TableCell>
-                                            <TableCell align="left">{row.total}</TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={rows.filter(row => row.search).length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
-        </Box>
+                                                <TableCell>
+                                                    <Checkbox
+                                                        color="primary"
+                                                        checked={isItemSelected}
+                                                        inputProps={{
+                                                            'aria-labelledby': labelId,
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell
+                                                    component="th"
+                                                    id={labelId}
+                                                    scope="row"
+                                                    align={'left'}
+                                                >
+                                                    {row.name}
+                                                </TableCell>
+                                                <TableCell align="left">{row.date}</TableCell>
+                                                <TableCell align="left">{row.service}</TableCell>
+                                                <TableCell align="left" style={{maxWidth: '5em'}}>{row.features}</TableCell>
+                                                <TableCell align="left">{row.complexity}</TableCell>
+                                                <TableCell align="left">{row.platform}</TableCell>
+                                                <TableCell align="left">{row.users}</TableCell>
+                                                <TableCell align="left">{row.total}</TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={rows.filter(row => row.search).length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </Paper>
+            </Box>
+        </>
     );
 }
