@@ -8,7 +8,6 @@ import theme from '../src/ui/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import Header from '../src/ui/Header/Header';
 import Footer from '../src/ui/Footer/Footer';
-import {Toolbar} from '@mui/material';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -25,7 +24,7 @@ export default function MyApp(props) {
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <Header/>
-          <Component {...pageProps} />
+        <Component {...pageProps} />
         <Footer/>
       </ThemeProvider>
     </CacheProvider>

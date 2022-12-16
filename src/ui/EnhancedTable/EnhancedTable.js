@@ -20,7 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import {useEffect, useState} from 'react';
-import {Chip, Grid, InputAdornment, Menu, MenuItem, Snackbar, TextField} from '@mui/material';
+import {Chip, Grid, InputAdornment, Menu, MenuItem, Snackbar, TextField, useMediaQuery, useTheme} from '@mui/material';
 import Button from '@mui/material/Button';
 import styles from './EnhancedTable.module.css';
 
@@ -342,6 +342,9 @@ export default function EnhancedTable({rows, page, setPage, setRows, websiteChec
     const [filterPrice, setFilterPrice] = useState('');
     const [filterExp, setFilterExp] = useState('');
 
+    const theme = useTheme();
+    const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
+
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -423,8 +426,8 @@ export default function EnhancedTable({rows, page, setPage, setRows, websiteChec
 
     return (
         <>
-            <Box sx={{ width: '100%' }}>
-                <Paper sx={{ width: '100%', mb: 2 }}>
+            <Box sx={{ width: '100%'}}>
+                <Paper sx={{width: matchesLg ? '90vw' : '100%', mb: 2, overflowX: 'auto' }}>
                     <EnhancedTableToolbar setRows={setRows} rows={rows} selected={selected} setSelected={setSelected} numSelected={selected.length} filterPrice={filterPrice} setFilterPrice={setFilterPrice} setFilterExp={setFilterExp}/>
                     <TableContainer>
                         <Table
@@ -478,7 +481,7 @@ export default function EnhancedTable({rows, page, setPage, setRows, websiteChec
                                                 </TableCell>
                                                 <TableCell align="left">{row.date}</TableCell>
                                                 <TableCell align="left">{row.service}</TableCell>
-                                                <TableCell align="left" style={{maxWidth: '5em'}}>{row.features}</TableCell>
+                                                <TableCell align="left" style={{width: '5em'}}>{row.features}</TableCell>
                                                 <TableCell align="left">{row.complexity}</TableCell>
                                                 <TableCell align="left">{row.platform}</TableCell>
                                                 <TableCell align="left">{row.users}</TableCell>

@@ -13,9 +13,16 @@
 
 .rowContainer {
     margin-top: 2em;
+    max-width: 100%;
 }
 
 .addButton {
     color: #fff;
     margin-left: 2em;
+}
+
+@media only screen and (max-width: 1050px) {
+    .mainContainer {
+        padding: .75em 2em;
+    }
 }

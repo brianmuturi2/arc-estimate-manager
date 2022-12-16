@@ -11,7 +11,7 @@ export default function Header(props) {
 
   return (
     <React.Fragment>
-        <AppBar position="fixed" className={classes.appBar}>
+        <AppBar position="fixed" className={classes.appBar} sx={{width: '100vw', left: 0, right: 'auto'}}>
           <Toolbar disableGutters>
               <svg
                   className={classes.logo}
@@ -63,7 +63,7 @@ export default function Header(props) {
               </svg>
           </Toolbar>
         </AppBar>
-      <div className={classes.toolbarMargin} />
+        <div className={classes.toolbarMargin} />
     </React.Fragment>
   );
 }
