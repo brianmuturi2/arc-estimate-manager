@@ -19,8 +19,8 @@ import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import {useState} from 'react';
-import {InputAdornment, Menu, MenuItem, Snackbar, TextField} from '@mui/material';
+import {useEffect, useState} from 'react';
+import {Chip, Grid, InputAdornment, Menu, MenuItem, Snackbar, TextField} from '@mui/material';
 import Button from '@mui/material/Button';
 import styles from './EnhancedTable.module.css';
 
@@ -165,9 +165,13 @@ function EnhancedTableToolbar(props) {
     const [undo, setUndo] = useState([]);
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [totalFilter, setTotalFilter] = useState('>');
-    const [filterPrice, setFilterPrice] = useState('');
+    const {filterPrice, setFilterPrice, setFilterExp} = props;
 
     const menuOpen = Boolean(menuAnchorEl);
+
+    useEffect(() => {
+        setFilterExp('greater than');
+    }, [])
 
     function handleDelete() {
         const newRows = [...props.rows];
@@ -214,15 +218,22 @@ function EnhancedTableToolbar(props) {
     }
 
     function handleSetFilter() {
+        let filterExpression = '';
         if (totalFilter === '>') {
-            setTotalFilter('<');
+            filterExpression = '<';
+            setTotalFilter(filterExpression);
+            setFilterExp('less than');
         } else if (totalFilter === '<') {
-            setTotalFilter('=');
+            filterExpression = '=';
+            setTotalFilter(filterExpression);
+            setFilterExp('equal to');
         } else {
-            setTotalFilter('>');
+            filterExpression = '>';
+            setTotalFilter(filterExpression);
+            setFilterExp('greater than');
         }
         if (filterPrice) {
-            filterRows();
+            filterRows(filterPrice, filterExpression);
         }
     }
 
@@ -230,16 +241,15 @@ function EnhancedTableToolbar(props) {
         setFilterPrice(event.target.value);
 
         if (event.target.value !== '') {
-            filterRows()
+            filterRows(event.target.value, totalFilter)
         }
     }
 
-    function filterRows() {
-        const filter = totalFilter === '=' ? '===' : totalFilter;
-        console.log(filter)
+    function filterRows(filterVal, filterExp) {
+        const filter = filterExp === '=' ? '===' : filterExp;
 
         const newRows = [...props.rows];
-        newRows.map(row => eval(`${event.target.value} ${filter} ${row.total.slice(1, row.total.length)}`) ? row.search = true : row.search = false);
+        newRows.map(row => eval(`${filterVal} ${filter} ${row.total.slice(1, row.total.length)}`) ? row.search = true : row.search = false);
         props.setRows(newRows);
     }
 
@@ -329,6 +339,8 @@ export default function EnhancedTable({rows, page, setPage, setRows, websiteChec
     const [orderBy, setOrderBy] = React.useState('name ');
     const [selected, setSelected] = React.useState([]);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [filterPrice, setFilterPrice] = useState('');
+    const [filterExp, setFilterExp] = useState('');
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -391,11 +403,29 @@ export default function EnhancedTable({rows, page, setPage, setRows, websiteChec
         }
     }
 
+    function handleClearChip() {
+        setFilterPrice('')
+
+        const newRows = [...rows];
+        newRows.map(row => row.search = true);
+        setRows(newRows);
+    }
+
+    function priceFilters(rows) {
+        if (filterPrice !== ''){
+            const filter = filterExp === 'equal to' ? '===' : filterExp === 'less than' ? '<' : '>';
+
+            const newRows = [...rows];
+            newRows.map(row => eval(`${filterPrice} ${filter} ${row.total.slice(1, row.total.length)}`) ? !row.search ? null : row.search = true : row.search = false);
+            return newRows;
+        } return rows;
+    }
+
     return (
         <>
             <Box sx={{ width: '100%' }}>
                 <Paper sx={{ width: '100%', mb: 2 }}>
-                    <EnhancedTableToolbar setRows={setRows} rows={rows} selected={selected} setSelected={setSelected} numSelected={selected.length} />
+                    <EnhancedTableToolbar setRows={setRows} rows={rows} selected={selected} setSelected={setSelected} numSelected={selected.length} filterPrice={filterPrice} setFilterPrice={setFilterPrice} setFilterExp={setFilterExp}/>
                     <TableContainer>
                         <Table
                             sx={{ minWidth: 750 }}
@@ -413,7 +443,7 @@ export default function EnhancedTable({rows, page, setPage, setRows, websiteChec
                             <TableBody>
                                 {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.sort(getComparator(order, orderBy)).slice() */}
-                                {stableSort(switchFilters().filter(row => row.search), getComparator(order, orderBy))
+                                {stableSort(priceFilters(switchFilters()).filter(row => row.search), getComparator(order, orderBy))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row, index) => {
                                         const isItemSelected = isSelected(row.name);
@@ -462,12 +492,20 @@ export default function EnhancedTable({rows, page, setPage, setRows, websiteChec
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={rows.filter(row => row.search).length}
+                        count={priceFilters(switchFilters()).filter(row => row.search).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />
+                    <Grid container justifyContent={'flex-end'} className={styles.chipContainer}>
+                        <Grid item>
+                            {filterPrice !== '' ? (
+                                <Chip onDelete={handleClearChip}
+                                    label={`Price is ${filterExp} ${filterPrice}`}/>
+                            ) : null}
+                        </Grid>
+                    </Grid>
                 </Paper>
             </Box>
         </>

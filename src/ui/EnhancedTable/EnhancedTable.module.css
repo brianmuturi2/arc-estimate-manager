@@ -2,12 +2,12 @@
     background-color: #fff;
 }
 
-.menu.Mui-focusVisible {
-    background-color: #fff;
-}
-
 .totalFilter {
     cursor: pointer;
     font-size: 2rem;
     color: #FFBA60;
+}
+
+.chipContainer {
+    padding: 1em;
 }
